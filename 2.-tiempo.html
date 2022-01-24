@@ -12,7 +12,7 @@ class: center, middle, inverse, title-slide
 
 # Taller R - Rifa Valentina
 ## 2. Manipulación de variables de tiempo
-### <code>19/01/2022</code>
+### <code>26/01/2022</code>
 
 ---
 
@@ -24,7 +24,6 @@ class: center, middle, inverse, title-slide
 
 
 
----
 
 # Contenidos
 
@@ -41,19 +40,11 @@ class: center, middle, inverse, title-slide
 
 ---
 
-class: inverse, center, middle
-
-# 2. Manipulacion de fechas
-
-`Paquete lubridate`
-
----
-
 background-image: url(https://media2.giphy.com/media/xsF1FSDbjguis/200w.webp?cid=3640f6095c9321d95239485951223fbe)
 background-size: cover
 class: center, bottom, inverse
 
-# 2. Manipulacion de fechas
+# Manipulacion de fechas
 
 ---
 
@@ -120,7 +111,7 @@ as.numeric(mi_cumple)
 
 --
 
-La función `as.Date()` recibió una cadena de caracteres y la transformó en un objeto fecha (`date`), y esa fecha aloja un número. .medium-par-red[¿Qué representa ese número?]
+La función `as.Date()` nos dio un número. .medium-par-red[¿Qué representa ese número?]
 
 ---
 
@@ -177,6 +168,14 @@ Se llama `lubridate` y su objetivo es hacer más intuitiva la manipulación y an
 
 --
 
+&lt;a href="https://lubridate.tidyverse.org/index.html" target="_blank"&gt;&lt;img src="https://raw.githubusercontent.com/tidyverse/lubridate/main/man/figures/logo.png" width="20%" style="display: block; margin: auto;" /&gt;&lt;/a&gt;
+
+
+
+---
+
+# Variables de tiempo en R
+
 Veamos algunos operadores básicos muy útiles.
 
 --
@@ -189,7 +188,7 @@ Sys.Date() # La fecha de hoy
 ```
 
 ```
-## [1] "2022-01-20"
+## [1] "2022-01-24"
 ```
 
 ```r
@@ -197,12 +196,12 @@ Sys.time() # el momento exacto, con fecha, horas, minutos y segundos
 ```
 
 ```
-## [1] "2022-01-20 18:32:07 -03"
+## [1] "2022-01-24 13:17:23 -03"
 ```
 
 ---
 
-# Manejo de fechas con `lubridate`
+# Usando `lubridate`
 
 --
 
@@ -213,25 +212,11 @@ Sys.time() # el momento exacto, con fecha, horas, minutos y segundos
 
 ```r
 library(lubridate) # cargamos lubridate
-```
-
-```
-## 
-## Attaching package: 'lubridate'
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     date, intersect, setdiff, union
-```
-
-```r
 today() 
 ```
 
 ```
-## [1] "2022-01-20"
+## [1] "2022-01-24"
 ```
 
 ```r
@@ -239,7 +224,7 @@ now()
 ```
 
 ```
-## [1] "2022-01-20 18:32:07 -03"
+## [1] "2022-01-24 13:17:23 -03"
 ```
 
 --
@@ -248,7 +233,7 @@ now()
 
 --
 
-- Desde una cadena de caracteres o numeros. 
+- Desde una cadena de caracteres o números. 
 
 --
 
@@ -256,7 +241,7 @@ now()
 
 ---
 
-# Manejo de fechas con `lubridate`
+# Usando `lubridate`
 
 --
 
@@ -306,7 +291,7 @@ dmy("30/sep/1993")
 
 ---
 
-# Manejo de fechas con `lubridate`
+# Usando `lubridate`
 
 --
 
@@ -331,7 +316,10 @@ dmy(22032019)
 ## [1] "2019-03-22"
 ```
 
---
+
+---
+
+# Usando `lubridate`
 
 **2. Creación desde componentes *date-time* individuales**
 
@@ -339,17 +327,17 @@ dmy(22032019)
 
 A veces las fechas nos llegan en un *data frame* separadas en día, mes, año.
 
----
+--
 
-# Manejo de fechas con `lubridate`
+Debemos unirlas para operarlas como objetos *date*. 
 
 --
 
-Debemos unirlas para operarlas como objetos *date*. **Usaremos la base de nacimientos de EEVV 2017**.
+**Usaremos la base de nacimientos de EEVV 2017**.
 
 --
 
-Para crear un objeto `date` que llamaremos `fecha_nac` usamos la función `make_date()` de `lubridate`.
+Usamos la función `make_date()` de `lubridate`.
 
 
 
@@ -359,13 +347,23 @@ library(readxl)
 library(lubridate)
 
 nac2017 &lt;- read_excel("data/nac_2017.xlsx")
+```
 
+--
+
+
+```r
 # seleccionamos día, mes, año de nacimiento y creamos una fecha
 nac2017 %&gt;% 
-  select(dia_nac, mes_nac, ano_nac) %&gt;% 
-  mutate(fecha_nac = make_date(ano_nac, mes_nac, dia_nac)) %&gt;% 
-  head(5)
+  mutate(fecha_nac = make_date(year=ano_nac, 
+                               month=mes_nac, 
+                               day=dia_nac)) 
 ```
+
+---
+
+# Usando `lubridate`
+
 
 ```
 ## # A tibble: 5 x 4
@@ -378,33 +376,26 @@ nac2017 %&gt;%
 ## 5      10       4    2017 2017-04-10
 ```
 
----
+--
 
-# Mini-ejercicio 2
+Si no hay variable día, utilizar carácter "01"
 
 --
-&lt;br/&gt;
-&lt;br/&gt;
-Utilizando la base de datos "nac2017" que acabamos de cargar en nuestro entorno de trabajo.
 
---
-&lt;br/&gt;
-&lt;br/&gt;
-1- Generar dentro de la base de datos (en la misma o un objeto nuevo) una variable llamada "fecha_nac" que contenga en un solo campo la fecha de nacimiento completa de cada nacido.
 
---
-&lt;br/&gt;
-&lt;br/&gt;
-2- Generar además una variable llamada "fecha_ins" que contenga en un solo campo la fecha de inscripción completa de cada nacido.
+```r
+nac2017 %&gt;% 
+  mutate(fecha_nac = make_date(year=ano_nac, 
+                               month=mes_nac, 
+                               day="01")) 
+```
+
 
 ---
 
-# Mini-ejercicio 2: solución
+# Mini ejercicio 
 
---
-
-Es posible crear ambas variables en un solo paso.
-
+Crear variable fecha de nacimiento y fecha de inscripción.
 
 
 ```r
@@ -436,7 +427,7 @@ nac2017 %&gt;% select(ano_nac, mes_nac, dia_nac, ano_ins, mes_ins,
 
 ---
 
-# Manejo de fechas con `lubridate`
+# Usando `lubridate`
 
 --
 
@@ -503,7 +494,7 @@ today() - ymd("1993-09-30")
 ```
 
 ```
-## Time difference of 10339 days
+## Time difference of 10343 days
 ```
 
 --
@@ -529,7 +520,7 @@ today() + years(1) + months(1)
 ```
 
 ```
-## [1] "2023-02-20"
+## [1] "2023-02-24"
 ```
 
 ---
@@ -615,7 +606,7 @@ bisiesto %m+% days(1)
 
 --
 
-Además se pueden generar automáticamente varios periodos. .pur[Esto puede ser muy útil para validar datos] 👀
+Además se pueden generar automáticamente varios periodos.
 
 
 ```r
@@ -683,39 +674,9 @@ Ahora con `%/%`.
 ---
 
 
-# Mini-ejercicio 3
+# Mini-ejercicio
 
---
-&lt;br/&gt;
-Vamos a utilizar la base de datos donde creamos "fecha_nac" y "fecha_ins".
-
---
-
-La variable "fecha_nac" refiere a la .pur[fecha de nacimiento] de un nacido durante el año estadístico 2017 y "fecha_ins" indica la .pur[fecha en que el nacido fue inscrito].
-
---
-
-1- Genera una variable llamada "dif_days" que indique la **diferencia en días** entre que los nacidos nacieron y fueron inscritos.
-
---
-
-2- Genera una variable llamada "dif_weeks" que indique la **diferencia en semanas enteras** (sin decimales) entre que los nacidos nacieron y fueron inscritos.
-
---
-
-3- Escoje una de las dos variables creadas y **genera una tabla de resumen** que contenga la mínima diferencia, la máxima, diferencia media y la mediana.
-
---
-
-.center[.medium-par[Para resolver el punto 3 usen ` %&gt;% summarise(min(),max(),media(),median())`️]]
-
----
-
-
-# Mini-ejercicio 3
-
-
-1- Generar "dif_days".
+1- Generar "dif_days" entre fecha nacimiento e inscripción
 
 --
 
@@ -739,15 +700,22 @@ nac2017 &lt;- nac2017 %&gt;%
 
 
 ```r
-resumen_dif &lt;- nac2017 %&gt;% summarise(min_dif = min(dif_days),
+nac2017 %&gt;% summarise(min_dif = min(dif_days),
                                      max_dif = max(dif_days),
                                      media_dif = mean(dif_days),
                                      median_dif = median(dif_days))
 ```
 
+```
+## # A tibble: 1 x 4
+##   min_dif max_dif media_dif median_dif
+##     &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+## 1       0     397      3.89          3
+```
+
 ---
 
-# Manejo de fechas con `lubridate`
+# Usando `lubridate`
 
 --
 
@@ -779,33 +747,77 @@ Pueden encontrar muchísima más información [aquí](https://lubridate.tidyvers
 
 Para crear series de tiempo
 
+--
+
 
 ```r
 # Identificar fecha inicio y fin
 inicio &lt;- "2016-11-01"
-fin &lt;- "2017-08-01"   
+fin &lt;- "2017-06-01"   
+```
 
+--
+
+
+```r
 # Contar meses entre medio
 meses &lt;- ((ymd(inicio) %--% ymd(fin)) / months(1) )
+meses
+```
 
+```
+## [1] 7
+```
+
+--
+
+
+```r
 ## Crear serie
 ano_mes_dia &lt;- ymd(inicio) %m+% months(0:meses) %&gt;% as.character()
 ano_mes_dia
 ```
 
 ```
-##  [1] "2016-11-01" "2016-12-01" "2017-01-01" "2017-02-01" "2017-03-01"
-##  [6] "2017-04-01" "2017-05-01" "2017-06-01" "2017-07-01" "2017-08-01"
+## [1] "2016-11-01" "2016-12-01" "2017-01-01" "2017-02-01" "2017-03-01"
+## [6] "2017-04-01" "2017-05-01" "2017-06-01"
 ```
+--
+
 
 ```r
-## Si el dia molesta
-substr(ano_mes_dia,1,7)
+substr(ano_mes_dia,1,7) ## Si el dia molesta
 ```
 
-```
-##  [1] "2016-11" "2016-12" "2017-01" "2017-02" "2017-03" "2017-04" "2017-05"
-##  [8] "2017-06" "2017-07" "2017-08"
+
+
+---
+
+# Uso práctico
+
+Recomendación: si haces gráfico con fechas aprovecha y utiliza *lubridate*
+
+--
+
+Cuando visualizamos variables en **años** no hay mayor problema, pueden ser números.
+El tema empieza cuando hay meses o días. 
+
+--
+
+Veamos series de empleo (ENE): tasa de desocupación
+
+--
+
+
+```r
+# link
+url &lt;- "https://www.ine.cl/docs/default-source/ocupacion-y-desocupacion/cuadros-estadisticos/series-de-tiempo-nueva-calibraci%C3%B3n-proyecciones-de-poblaci%C3%B3n-censo-2017/indicadores_principales.xlsx?sfvrsn=afbd6d15_58"
+
+# donde guardar
+destfile &lt;- "data/ine_desocupacion.xlsx"
+
+# descargar
+download.file(url, destfile, method = "curl")
 ```
 
 
@@ -813,7 +825,136 @@ substr(ano_mes_dia,1,7)
 
 # Uso práctico
 
-Recomendación: si haces gráfico con fechas aprovecha y utiliza lubridate
+
+```r
+# cargar la data
+desocup &lt;- readxl::read_excel("data/ine_desocupacion.xlsx",skip = 6,sheet = 2)
+head(desocup,4)
+```
+
+```
+## # A tibble: 4 x 28
+##   ...1  ...2      nota...3 `en miles...4` nota...5 `en miles...6` nota...7
+##   &lt;chr&gt; &lt;chr&gt;     &lt;lgl&gt;             &lt;dbl&gt; &lt;lgl&gt;             &lt;dbl&gt; &lt;lgl&gt;   
+## 1 2010  Ene - Mar NA               13218. NA                7884. NA      
+## 2 2010  Feb - Abr NA               13236. NA                7897. NA      
+## 3 2010  Mar - May NA               13253. NA                7900. NA      
+## 4 2010  Abr - Jun NA               13270. NA                7906. NA      
+## # ... with 21 more variables: en miles...8 &lt;dbl&gt;, nota...9 &lt;lgl&gt;,
+## #   en miles...10 &lt;dbl&gt;, nota...11 &lt;lgl&gt;, en miles...12 &lt;dbl&gt;, nota...13 &lt;chr&gt;,
+## #   en miles...14 &lt;dbl&gt;, nota...15 &lt;lgl&gt;, en miles...16 &lt;dbl&gt;, nota...17 &lt;chr&gt;,
+## #   en miles...18 &lt;dbl&gt;, nota...19 &lt;lgl&gt;, en miles...20 &lt;dbl&gt;, nota...21 &lt;lgl&gt;,
+## #   en miles...22 &lt;dbl&gt;, nota...23 &lt;lgl&gt;, tasa (%)...24 &lt;dbl&gt;, nota...25 &lt;lgl&gt;,
+## #   tasa (%)...26 &lt;dbl&gt;, nota...27 &lt;lgl&gt;, tasa (%)...28 &lt;dbl&gt;
+```
+
+--
+
+.center[.inverse[¿Que se ve?]]
+
+--
+
+Fechas como carácter y año separado de meses. Además, meses como trimestres. 
+
+---
+
+# Uso práctico
+
+
+```r
+# Limpiar y renombrar
+desocup &lt;- desocup %&gt;% janitor::clean_names() %&gt;% 
+  select(x1,x2,tasa_percent_24) %&gt;% 
+  filter(!is.na(x2)) %&gt;% 
+  rename(ano=x1,mes=x2)
+head(desocup,2)
+```
+
+```
+## # A tibble: 2 x 3
+##   ano   mes       tasa_percent_24
+##   &lt;chr&gt; &lt;chr&gt;               &lt;dbl&gt;
+## 1 2010  Ene - Mar            9.23
+## 2 2010  Feb - Abr            8.84
+```
+
+--
+
+Año ok, pero mes en español y trimestre. 
+
+--
+
+
+```r
+desocup$mes &lt;- tolower(substr(desocup$mes,1,3))
+table(desocup$mes)
+```
+
+```
+## 
+## abr ago dic ene feb jul jun mar may nov oct sep 
+##  12  12  11  12  12  12  12  12  12  11  11  12
+```
+
+
+---
+
+# Uso práctico
+
+
+```r
+desocup &lt;- desocup %&gt;% 
+ mutate(mes=case_when(mes == "ene" ~ 2,
+                      mes == "feb" ~ 3,
+                      mes == "mar" ~ 4,
+                      mes == "abr" ~ 5,
+                      mes == "may" ~ 6,
+                      mes == "jun" ~ 7,
+                      mes == "jul" ~ 8,
+                      mes == "ago" ~ 9,
+                      mes == "sep" ~ 10,
+                      mes == "oct" ~ 11,
+                      mes == "nov" ~ 12,
+                      mes == "dic" ~ 1)) %&gt;% 
+  mutate(fecha=make_date(year=ano,
+                         month=mes))
+```
+
+--
+
+
+```
+## # A tibble: 3 x 4
+##   ano     mes tasa_percent_24 fecha     
+##   &lt;chr&gt; &lt;dbl&gt;           &lt;dbl&gt; &lt;date&gt;    
+## 1 2010      2            9.23 2010-02-01
+## 2 2010      3            8.84 2010-03-01
+## 3 2010      4            9.09 2010-04-01
+```
+
+
+---
+
+## Uso práctico
+
+&lt;img src="2.-tiempo_files/figure-html/unnamed-chunk-47-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+
+# El código
+
+
+```r
+library(scales)
+library(ggplot2)
+desocup %&gt;% 
+  ggplot(aes(x=fecha,y=tasa_percent_24))+
+  geom_line()+
+  theme_bw()+
+  scale_x_date(labels = date_format("%Y-%b"),breaks='2 year' ) +
+  scale_y_continuous(limits = c(0,15))
+```
+
 
 
 
