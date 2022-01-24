@@ -1,0 +1,9 @@
+
+.Rproj.user/
+*.xls
+*.xlsx
+*.rds
+*.sav
+.Rhistory
+data/Nesstar EEVV.pdf
+*.zip
