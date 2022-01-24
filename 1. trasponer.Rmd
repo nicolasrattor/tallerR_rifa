@@ -1,7 +1,8 @@
 ---
 title: "Taller R - Rifa Valentina"
-subtitle: "1. Transformación avazanzada de data frames"
+subtitle: "Pivotear y combinar data"
 date: "`26/01/2022`"
+author: "Nicolás Ratto"
 output:
   xaringan::moon_reader:
     lib_dir: libs

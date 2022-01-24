@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Taller R - Rifa Valentina</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Nicolás Ratto" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Taller R - Rifa Valentina
+## Funciones y procesos iterativos
+### Nicolás Ratto
+### <code>16/02/2022</code>
+
+---
+
+
+
+
+
+
+
+
+
+# Contenidos curso
+
++ Manipulación avanzada de data frames (funciones `pivot` y combinación de data frames)
+
++ Manipulación de fechas: paquete `lubridate`
+
++ Visualización de datos con `ggplot2`
+
++ Estimar desde diseños muestrales complejos (paquete `survey` y `srvyr`)
+
++ **Procesos iterativos y funciones**
+
+
+---
+
+class: inverse, center, middle
+
+# Interacción con pc y envaironment
+
+`ls()`, `list.fles()`, `getwd()`
+
+---
+
+# Introducción
+
+**Siempre** R está trabajando desde una ruta del computador
+
+--
+
+Desde esta ruta comienza la lectura y carga de archivos
+
+--
+
+Para conocer esta ruta:
+
+
+```r
+getwd()
+```
+
+```
+## [1] "C:/Users/Nratto/Documents/Github/tallerR_rifa"
+```
+--
+
+Para modificarla solo dos formas recomendadas.
+
+--
+
++ Crear un nuevo RProject
+
+--
+
++ Abrir un nuevo documento RMarkdown
+
+--
+
+Es decir, **nunca utilizar setwd()**
+
+---
+
+# ¡Muerte a direct absolutos!
+
+&lt;img src="https://raw.githubusercontent.com/allisonhorst/stats-illustrations/master/rstats-artwork/cracked_setwd.png" width="90%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Introducción
+
+Ya sabemos cargar desde el pc archivos en diferentes formatos.
+
+--
+
+Pero, ¿como saber todo lo que existe en una ruta? (una vez que definimos la que nos interesa)
+
+--
+
+
+```r
+list.files()
+```
+
+```
+##  [1] "1.-trasponer.html"   "1.-trasponer_files"  "1. trasponer.Rmd"   
+##  [4] "2.-tiempo.html"      "2.-tiempo_files"     "2. tiempo.Rmd"      
+##  [7] "3.-ggplot2.html"     "3.-ggplot2_files"    "3. ggplot2.Rmd"     
+## [10] "4.-survey.html"      "4. survey.Rmd"       "5.-iteraciones.Rmd" 
+## [13] "5. iteraciones.Rmd"  "data"                "datos-encuesta"     
+## [16] "datos_ene"           "imagenes"            "libs"               
+## [19] "pdf"                 "README.md"           "tallerR_rifa.Rproj" 
+## [22] "xaringan-themer.css"
+```
+--
+
+Para retroceder e ir a otra carpeta
+
+
+```r
+list.files(path = "../vignettes")
+```
+
+```
+## [1] "my-vignette.html" "my-vignette.Rmd"
+```
+
+
+---
+
+# Introducción
+
+En nuestra ruta de interés, podemos preguntarnos si existe una carpeta o archivo
+
+--
+
+
+```r
+file.exists("1.-trasponer.html")
+```
+
+```
+## [1] TRUE
+```
+--
+
+
+```r
+file.exists("6.-hacer-paquetes.html")
+```
+
+```
+## [1] FALSE
+```
+
+--
+
+
+```r
+file.exists("datos_ene")
+```
+
+```
+## [1] TRUE
+```
+
+
+---
+
+# Introducción
+
+Si la carpeta no existe, podemos crearla
+
+--
+
+
+
+
+
+```r
+ifelse(
+    dir.exists("datos_ene"),
+    "Directorio existe",
+    dir.create("datos_ene")
+)
+```
+
+```
+## [1] TRUE
+```
+
+--
+
+¿Funcionó?
+
+--
+
+
+```r
+ifelse(
+    dir.exists("datos_ene"),
+    "Directorio existe",
+    dir.create("datos_ene")
+)
+```
+
+```
+## [1] "Directorio existe"
+```
+
+---
+
+# Introducción
+
+Si es un archivo también se puede
+
+--
+
+Crear dato basura
+
+
+```r
+basura &lt;- data.frame(x=c(1:10),y=c(100:109))
+```
+
+--
+
+Exportar dato si no existe
+
+
+```r
+ifelse(
+    file.exists("datos_ene/basura.xlsx"),
+    "dato existe",
+    writexl::write_xlsx(basura,"datos_ene/basura.xlsx")
+)
+```
+
+```
+## [1] "C:\\Users\\Nratto\\Documents\\Github\\tallerR_rifa\\datos_ene\\basura.xlsx"
+```
+
+
+---
+
+# Introducción
+
+Creemos más basura
+
+
+```r
+basura2 &lt;- data.frame(x=c(1:10),y=c(100:109))
+data3 &lt;- data.frame(x=c(1:10),y=c(100:109))
+data4 &lt;- data.frame(x=c(1:10),y=c(100:109))
+```
+
+--
+
+¿Para saber que hay en nuestro ambiente?
+
+
+```r
+ls()
+```
+
+```
+## [1] "basura"       "basura2"      "blue"         "dark_yellow"  "data3"       
+## [6] "data4"        "gray"         "light_yellow"
+```
+
+--
+
+Según patrón
+
+
+```r
+ls(pattern = "basura")
+```
+
+```
+## [1] "basura"  "basura2"
+```
+--
+
+
+```r
+rm(list=ls(pattern = "basura")) # borrar
+```
+
+
+
+---
+
+class: inverse, center, middle
+
+# Descargar datos desde R
+
+`download.file()`
+
+---
+
+# Descargar datos desde R
+
+Para automatizar todo o hacerlo lo más reproducible posible, nos evitaremos incluso descargar los datos mediante *clicks*. 
+
+--
+
+Salvo que queramos descargar .rar, `download.file` sirve:
+
+
+```r
+download.file(url="link a pagina",
+              destfile = "ruta del pc en donde guardar archivo",
+              method = "curl",
+              mode="wb")
+```
+
+--
+
+
+```r
+url &lt;- "https://www.ine.cl/docs/default-source/ocupacion-y-desocupacion/bbdd/2021/formato-csv/ene-2021-10-son.csv?sfvrsn=f996a435_6&amp;download=true"
+
+destfile &lt;- "datos_ene/ene_2021_10.csv"
+
+download.file(url, destfile, mode = "wb")
+```
+
+--
+
+
+```r
+if(!file.exists(destfile)){
+download.file(url, destfile, mode = "wb")
+        }
+```
+
+
+
+---
+
+class: inverse, center, middle
+
+# Proceso iterativo y condiciones
+
+`for() e if()`
+
+---
+
+# if()
+
+Ya lo vimos un poco, la lógica es:
+
+
+```r
+if(condicion){
+  acción a implementar si la condicion es verdadera
+}
+```
+
+--
+
+
+```r
+if((1+1)==2){
+  "suma correcta"
+}
+```
+
+```
+## [1] "suma correcta"
+```
+--
+
+
+```r
+if((1+2)==2){
+  "suma correcta"
+}
+```
+
+Condición false, no pasa nada...
+
+
+---
+
+# if()
+
+
+
+---
+
+# for()
+
+
+
+
+---
+
+class: inverse, center, middle
+
+# Funciones
+
+`function()`
+
+
+---
+
+class: inverse, center, middle
+
+# Entender los paquetes
+
+`devtools`
+
+
+
+---
+
+### Recursos web utilizados
+
+[Xaringan: Presentation Ninja, de Yihui Xie](https://github.com/yihui/xaringan). Para generar esta presentación.
+
+[Ilustraciones de Allison Horst](https://github.com/allisonhorst/stats-illustrations)
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

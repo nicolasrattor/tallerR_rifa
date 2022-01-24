@@ -1,0 +1,385 @@
+---
+title: "Taller R - Rifa Valentina"
+subtitle: "Funciones y procesos iterativos"
+date: "`16/02/2022`"
+author: "Nicolás Ratto"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: [xaringan-themer.css]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+library(dplyr)
+library(guaguas)
+
+dark_yellow <- "#9667db"
+light_yellow <- "#F7E9FD"
+gray <- "#333333"
+blue <- "#4466B0"
+
+style_duo(
+  # colors
+  primary_color = light_yellow,
+  secondary_color = dark_yellow,
+  header_color = gray,
+  text_color = gray,
+  code_inline_color = colorspace::lighten(gray),
+  text_bold_color = colorspace::lighten(gray),
+  link_color = blue,
+  title_slide_text_color = blue,
+
+  # fonts
+  header_font_google = google_font("Martel", "300", "400"),
+  text_font_google = google_font("Lato"),
+  code_font_google = google_font("Fira Mono")
+)
+```
+
+```{r echo=FALSE,include=FALSE}
+#pagedown::chrome_print(input="5.-iteraciones.html",output="pdf/5. iteraciones.pdf")
+```
+
+# Contenidos curso
+
++ Manipulación avanzada de data frames (funciones `pivot` y combinación de data frames)
+
++ Manipulación de fechas: paquete `lubridate`
+
++ Visualización de datos con `ggplot2`
+
++ Estimar desde diseños muestrales complejos (paquete `survey` y `srvyr`)
+
++ **Procesos iterativos y funciones**
+
+
+---
+
+class: inverse, center, middle
+
+# Interacción con pc y envaironment
+
+`ls()`, `list.fles()`, `getwd()`
+
+---
+
+# Introducción
+
+**Siempre** R está trabajando desde una ruta del computador
+
+--
+
+Desde esta ruta comienza la lectura y carga de archivos
+
+--
+
+Para conocer esta ruta:
+
+```{r}
+getwd()
+```
+--
+
+Para modificarla solo dos formas recomendadas.
+
+--
+
++ Crear un nuevo RProject
+
+--
+
++ Abrir un nuevo documento RMarkdown
+
+--
+
+Es decir, **nunca utilizar setwd()**
+
+---
+
+# ¡Muerte a direct absolutos!
+
+```{r fig.align='center', out.width = "90%", echo=FALSE}
+knitr::include_graphics("https://raw.githubusercontent.com/allisonhorst/stats-illustrations/master/rstats-artwork/cracked_setwd.png")
+```
+
+
+---
+
+# Introducción
+
+Ya sabemos cargar desde el pc archivos en diferentes formatos.
+
+--
+
+Pero, ¿como saber todo lo que existe en una ruta? (una vez que definimos la que nos interesa)
+
+--
+
+```{r}
+list.files()
+```
+--
+
+Para retroceder e ir a otra carpeta
+
+```{r}
+list.files(path = "../vignettes")
+```
+
+
+---
+
+# Introducción
+
+En nuestra ruta de interés, podemos preguntarnos si existe una carpeta o archivo
+
+--
+
+```{r}
+file.exists("1.-trasponer.html")
+```
+--
+
+```{r}
+file.exists("6.-hacer-paquetes.html")
+```
+
+--
+
+```{r}
+file.exists("datos_ene")
+```
+
+
+---
+
+# Introducción
+
+Si la carpeta no existe, podemos crearla
+
+--
+
+```{r echo=FALSE}
+unlink("datos_ene", recursive = TRUE)
+```
+
+
+```{r}
+ifelse(
+    dir.exists("datos_ene"),
+    "Directorio existe",
+    dir.create("datos_ene")
+)
+```
+
+--
+
+¿Funcionó?
+
+--
+
+```{r}
+ifelse(
+    dir.exists("datos_ene"),
+    "Directorio existe",
+    dir.create("datos_ene")
+)
+```
+
+---
+
+# Introducción
+
+Si es un archivo también se puede
+
+--
+
+Crear dato basura
+
+```{r}
+basura <- data.frame(x=c(1:10),y=c(100:109))
+```
+
+--
+
+Exportar dato si no existe
+
+```{r}
+ifelse(
+    file.exists("datos_ene/basura.xlsx"),
+    "dato existe",
+    writexl::write_xlsx(basura,"datos_ene/basura.xlsx")
+)
+```
+
+
+---
+
+# Introducción
+
+Creemos más basura
+
+```{r}
+basura2 <- data.frame(x=c(1:10),y=c(100:109))
+data3 <- data.frame(x=c(1:10),y=c(100:109))
+data4 <- data.frame(x=c(1:10),y=c(100:109))
+```
+
+--
+
+¿Para saber que hay en nuestro ambiente?
+
+```{r}
+ls()
+```
+
+--
+
+Según patrón
+
+```{r}
+ls(pattern = "basura")
+```
+--
+
+```{r}
+rm(list=ls(pattern = "basura")) # borrar
+```
+
+
+
+---
+
+class: inverse, center, middle
+
+# Descargar datos desde R
+
+`download.file()`
+
+---
+
+# Descargar datos desde R
+
+Para automatizar todo o hacerlo lo más reproducible posible, nos evitaremos incluso descargar los datos mediante *clicks*. 
+
+--
+
+Salvo que queramos descargar .rar, `download.file` sirve:
+
+```{r eval=FALSE}
+download.file(url="link a pagina",
+              destfile = "ruta del pc en donde guardar archivo",
+              method = "curl",
+              mode="wb")
+```
+
+--
+
+```{r eval=FALSE}
+url <- "https://www.ine.cl/docs/default-source/ocupacion-y-desocupacion/bbdd/2021/formato-csv/ene-2021-10-son.csv?sfvrsn=f996a435_6&download=true"
+
+destfile <- "datos_ene/ene_2021_10.csv"
+
+download.file(url, destfile, mode = "wb")
+
+```
+
+--
+
+```{r eval=FALSE}
+if(!file.exists(destfile)){
+download.file(url, destfile, mode = "wb")
+        }
+```
+
+
+
+---
+
+class: inverse, center, middle
+
+# Proceso iterativo y condiciones
+
+`for() e if()`
+
+---
+
+# if()
+
+Ya lo vimos un poco, la lógica es:
+
+```{r eval=FALSE}
+if(condicion){
+  acción a implementar si la condicion es verdadera
+}
+```
+
+--
+
+```{r}
+if((1+1)==2){
+  "suma correcta"
+}
+```
+--
+
+```{r}
+if((1+2)==2){
+  "suma correcta"
+}
+```
+
+Condición false, no pasa nada...
+
+
+---
+
+# if()
+
+
+
+---
+
+# for()
+
+
+
+
+---
+
+class: inverse, center, middle
+
+# Funciones
+
+`function()`
+
+
+---
+
+class: inverse, center, middle
+
+# Entender los paquetes
+
+`devtools`
+
+
+
+---
+
+### Recursos web utilizados
+
+[Xaringan: Presentation Ninja, de Yihui Xie](https://github.com/yihui/xaringan). Para generar esta presentación.
+
+[Ilustraciones de Allison Horst](https://github.com/allisonhorst/stats-illustrations)
+
+

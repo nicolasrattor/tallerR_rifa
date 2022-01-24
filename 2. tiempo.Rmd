@@ -1,7 +1,8 @@
 ---
 title: "Taller R - Rifa Valentina"
-subtitle: "2. Manipulación de variables de tiempo"
+subtitle: "Manipulación del tiempo"
 date: "`26/01/2022`"
+author: "Nicolás Ratto"
 output:
   xaringan::moon_reader:
     lib_dir: libs
