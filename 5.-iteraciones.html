@@ -113,11 +113,13 @@ list.files()
 ##  [1] "1.-trasponer.html"   "1.-trasponer_files"  "1. trasponer.Rmd"   
 ##  [4] "2.-tiempo.html"      "2.-tiempo_files"     "2. tiempo.Rmd"      
 ##  [7] "3.-ggplot2.html"     "3.-ggplot2_files"    "3. ggplot2.Rmd"     
-## [10] "4.-survey.html"      "4. survey.Rmd"       "5.-iteraciones.Rmd" 
-## [13] "5. iteraciones.Rmd"  "data"                "datos-encuesta"     
-## [16] "datos_ene"           "imagenes"            "libs"               
-## [19] "pdf"                 "README.md"           "tallerR_rifa.Rproj" 
-## [22] "xaringan-themer.css"
+## [10] "4.-survey.html"      "4. survey.Rmd"       "5.-iteraciones.html"
+## [13] "5.-iteraciones.Rmd"  "5. iteraciones.Rmd"  "6.-openxlsx.html"   
+## [16] "6. openxlsx.Rmd"     "data"                "datos-encuesta"     
+## [19] "datos_ene"           "datos_pt"            "ExportarExcel"      
+## [22] "imagenes"            "libs"                "output"             
+## [25] "pdf"                 "README.md"           "tallerR_rifa.Rproj" 
+## [28] "xaringan-themer.css"
 ```
 --
 
@@ -393,13 +395,185 @@ Condición false, no pasa nada...
 
 # if()
 
+Para tener respuesta con condición incorrecta, agregar `else`
+
+
+```r
+n &lt;- 1
+if((n+2)==2){
+  "suma correcta"
+} else{
+  "suma incorrecta"
+}
+```
+
+```
+## [1] "suma incorrecta"
+```
+--
+
+
+```r
+n &lt;- 0
+if(n+n &gt; 0){
+  "n es positivo"
+} else if(n+n &lt; 0) {
+  "n es negativo"
+} else{
+  "n es cero"
+}
+```
+
+```
+## [1] "n es cero"
+```
+
+---
+
+# for()
+
+Para cada valor X en una secuencia que va de Y a Z, ejecuta una acción. 
+
+--
+
+&lt;img src="https://media.geeksforgeeks.org/wp-content/uploads/20200327192448/for_flowdiagram.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+--
+
+`while()` y `repeat()` pueden ser útiles. En los personal no he tenido que usarlos. 
+
+Entendiendo la lógica de `for()` e `if()` estas funciones no tienen mayor complejidad. 
+
+---
+
+# for()
+
+Ejemplo simple:
+
+
+```r
+for(i in 1:5){
+  print(i + 1)
+}
+```
+
+```
+## [1] 2
+## [1] 3
+## [1] 4
+## [1] 5
+## [1] 6
+```
+
+--
+
+Imaginen la potencia de esto para exportar o importar cientos de archivos...
+
+--
+
+Veamos un ejemplo con las bases de puestos de trabajo de la EMR
+
+---
+
+# for()
+
+Crear secuencia de fechas
+
+
+```r
+library(dplyr)
+library(lubridate)
+
+inicio &lt;- "2016-01-01"
+fin &lt;- "2017-02-01"   
+
+meses &lt;- ((ymd(inicio) %--% ymd(fin)) / months(1) )
+
+ano_mes_dia &lt;- ymd(inicio) %m+% months(0:meses) %&gt;% as.character()
+ano_mes_dia
+```
+
+```
+##  [1] "2016-01-01" "2016-02-01" "2016-03-01" "2016-04-01" "2016-05-01"
+##  [6] "2016-06-01" "2016-07-01" "2016-08-01" "2016-09-01" "2016-10-01"
+## [11] "2016-11-01" "2016-12-01" "2017-01-01" "2017-02-01"
+```
+
+```r
+meses &lt;- length(ano_mes_dia)
+```
+
+---
+
+# for()
+
+Crear secuencia de meses en español
+
+
+```r
+meses_esp &lt;- rep(c("enero","febrero","marzo","abril","mayo","junio",
+      "julio","agosto","septiembre","octubre","noviembre","diciembre"),
+      trunc(meses/12))
+
+meses_esp &lt;- c(meses_esp,meses_esp[0:(meses%%12)])
+
+meses_esp
+```
+
+```
+##  [1] "enero"      "febrero"    "marzo"      "abril"      "mayo"      
+##  [6] "junio"      "julio"      "agosto"     "septiembre" "octubre"   
+## [11] "noviembre"  "diciembre"  "enero"      "febrero"
+```
+
+```r
+length(meses_esp)==length(ano_mes_dia)
+```
+
+```
+## [1] TRUE
+```
+
+---
+
+# for()
+
+Descargar bases
+
+
+```r
+for(i in 1:meses){
+  
+download.file(paste0("https://www.ine.cl/docs/default-source/sueldos-y-salarios/bbdd/base-anual-2016/base-de-puestos-de-trabajo/bases-rectificadas/",
+     year(ano_mes_dia[i]),"/",
+     meses_esp[i],"-",
+     year(ano_mes_dia[i]),".csv?sfvrsn=54c360d8_6&amp;download=true"),
+     destfile = paste0("datos_pt/",
+                       year(ano_mes_dia[i]),"_",
+                       sprintf("%02d", month(ano_mes_dia[i])),".csv"),
+     method = "libcurl")
+}
+```
+
+--
+
+
+```r
+list.files("datos_pt/")
+```
+
+```
+##  [1] "2016_01.csv" "2016_02.csv" "2016_03.csv" "2016_04.csv" "2016_05.csv"
+##  [6] "2016_06.csv" "2016_07.csv" "2016_08.csv" "2016_09.csv" "2016_10.csv"
+## [11] "2016_11.csv" "2016_12.csv" "2017_01.csv" "2017_02.csv"
+```
 
 
 ---
 
 # for()
 
-
+Ahora cargar bases en R
 
 
 ---
@@ -410,15 +584,9 @@ class: inverse, center, middle
 
 `function()`
 
-
 ---
 
-class: inverse, center, middle
-
-# Entender los paquetes
-
-`devtools`
-
+# Funciones
 
 
 ---
@@ -429,6 +597,7 @@ class: inverse, center, middle
 
 [Ilustraciones de Allison Horst](https://github.com/allisonhorst/stats-illustrations)
 
+[Loops in R](https://www.geeksforgeeks.org/loops-in-r-for-while-repeat/)
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

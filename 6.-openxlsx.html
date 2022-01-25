@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Taller R - Rifa Valentina</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Nicolás Ratto" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Taller R - Rifa Valentina
+## Exportar a excel controlando formatos
+### Nicolás Ratto
+### <code>23/02/2022</code>
+
+---
+
+
+
+
+
+
+
+
+
+
+# Exportar archivos a excel
+
+--
+&lt;br/&gt;
+
+.medium-par[Hay muchas formas de exportar tablas y bases de datos desde R a Excel.]
+&lt;br/&gt;
+&lt;br/&gt;
+
+--
+
+.medium-par[El proceso resulta fundamental cuando trabajamos en equipos y no todos manejan el lenguaje de R.]
+&lt;br/&gt;
+&lt;br/&gt;
+
+--
+
+.medium-par[El universo `tidyverse` no cuenta con paquetes para exportar datos a excel en formato `.xlsx`.]
+&lt;br/&gt;
+&lt;br/&gt;
+
+--
+
+.medium-par[La forma quizás más sencilla y difundida de hacerlo es con el paquete `writexl` (sintaxis sencilla y corta, pero limitada).]
+&lt;br/&gt;
+&lt;br/&gt;
+
+
+
+---
+
+# Exportación con `writexl`
+
+--
+
+.medium-par[En primer lugar creemos una base de datos ficticia:]
+
+--
+
+
+```r
+base1&lt;-as.data.frame(cbind(
+  a=c(1:10),
+  b=c(1:10)
+))
+
+head(base1,4)
+```
+
+```
+##   a b
+## 1 1 1
+## 2 2 2
+## 3 3 3
+## 4 4 4
+```
+
+--
+
+.medium-par[Para exportar la base de datos solamente hay que cargar el paquete `writexl` y especificar dos argumentos en la función `write_xlsx`:]
+
+--
+
+
+```r
+library(writexl)          
+write_xlsx(base1,          # objeto a exportar (data frame)
+  "output/nombre_archivo.xlsx")   # nombre de archivo a crear
+```
+
+
+---
+
+
+# Exportación con `writexl`
+
+--
+&lt;br/&gt;
+
+.medium-par[Por defecto, `write_xlsx` considerará en la exportación el nombre de las columnas y las pondrá centradas y en **negrito**.]
+
+
+--
+
+![](imagenes/base1.PNG)
+
+---
+
+# Exportación con `writexl`
+
+--
+
+.medium-par[¿Como evitarlo?]
+
+--
+
+Existen dos argumentos extra con los que se puede "jugar" en la función `write_xlsx`: col_names y format_headers.
+
+--
+
+Quitar nombres de columnas:
+
+
+```r
+library(writexl)          
+write_xlsx(base1,              # objeto a exportar (data frame)
+  "output/nombre_archivo2.xlsx",  # nombre de archivo a crear
+  col_names = FALSE,            # Base sin nombres de columnas
+  ) 
+```
+
+--
+
+Dejar nombre de columnas pero quitarles el formato
+
+
+```r
+library(writexl)          
+write_xlsx(base1,              # objeto a exportar (data frame)
+  "output/nombre_archivo3.xlsx",  # nombre de archivo a crear
+  col_names = TRUE,            # Base con nombres de columnas
+  format_headers = FALSE      # Nombres de columnas sin formato
+  ) 
+```
+
+---
+
+# Exportación con `writexl`
+
+--
+
+Una última posibilidad a revisar con `write_xlsx` tiene que ver con el exportar más de una base de datos en un mismo archivo (un archivo por pestaña).
+
+--
+
+Para esto, las distintas bases de datos a exportar deben agruparse en una lista (`list()`).
+
+--
+
+
+```r
+## Se crean dos nuevas bases de datos
+base2&lt;-as.data.frame(cbind(c=c(1:10),d=c(1:10)))
+base3&lt;-as.data.frame(cbind(e=c(1:10),f=c(1:10)))
+```
+
+--
+
+
+```r
+library(writexl)          
+write_xlsx(list(base1,base2,base3), # Bases en una lista.
+  "output/nombre_archivo4.xlsx",  # nombre de archivo a crear
+  ) 
+```
+
+---
+
+# Límites de `writexl`
+
+--
+
+En base a los cuatro argumentos de `write_xlsx`, ¿cómo podemos crear un archivo excel como el siguiente?
+
+--
+
+**Extracto base auditoría IR-ICMO**
+![Extracto base auditoría IR-ICMO](imagenes/auditoriaIRICMO.PNG)
+
+--
+
+No se puede. Hay que recurrir a funciones de otros paquetes, como `openxlsx`, que pemitirán:
+
++ Definir formato de celdas (color, color condicional, %, carácter, etc.)
++ Pegar más de una base de datos por pestañas
++ Inmovilizar paneles
++ Muchas cosas más. 
+
+
+---
+
+# El paquete `openxlsx`
+
+--
+
+En su forma más simple el código resulta más complejo que el de `writexl`:
+
+
+```r
+library(openxlsx)
+
+wb &lt;- createWorkbook()  ## Se crea libro de trabajo (wb)
+
+addWorksheet(wb,        ## Al objeto wb le damos una pestaña
+      sheetName = "pestaña1", 
+      gridLines = FALSE)
+
+writeData(wb = wb,        ## En el libro wb
+      sheet = "pestaña1", ## En su pestaña1
+      x = base1)          ## Cargamos el objeto base1
+
+saveWorkbook(wb = wb,     ## Exportamos el libro
+          file = "output/nombre_archivo5.xlsx", 
+          overwrite = TRUE)
+```
+
+--
+
+Más complejo, pero vale la pena para tener más control sobre los libros excel que crearemos a futuro. 
+
+--
+
+Lo más simple es copiar y pegar este código cuando quieran exportar, limitándose a cambiar los argumentos según sus objetos y direcciones de trabajo. 
+
+
+---
+
+# El paquete `openxlsx`
+
+--
+
+.medium-par[Definir posición exacta de objetos en cada pestaña]
+
+Una gran ventaja de `openxlsx` es que en una misma pestaña de excel pueden agregarse dos o más data frames.
+
+--
+
+Esto se logra señalando la posición exacta de cada una:
+
+
+```r
+wb2 &lt;- createWorkbook()  ## Se crea libro de trabajo 2 (wb2)
+
+addWorksheet(wb2,        ## Al objeto wb2 le damos una pestaña
+      sheetName = "pestaña1", 
+      gridLines = FALSE)
+
+writeData(wb = wb2,        ## En el libro wb2
+      sheet = "pestaña1", ## En su pestaña1
+      x = base1)          ## Cargamos el objeto base1
+
+## Por defecto, base1 se ubica en posición (1,1).
+```
+
+--
+
+Pero la posición de los objetos se puede determinar manualmente:
+
+--
+
+
+```r
+writeData(wb = wb2,       
+      sheet = "pestaña1",
+      startCol = 4,   ## Pegar nuevamente base 1 en col 4.
+      x = base1)    
+```
+
+
+
+
+
+---
+
+# El paquete `openxlsx`
+
+--
+
+.medium-par[Queda algo así:]
+
+![](imagenes/base1x2.PNG)
+
+--
+
+Evidentemente, señalándolo correctamente se puede volver agregar la base1 (u otra data frame) en cualquier otra posición de la pestaña1. 
+
+--
+
+
+```r
+## Por ejemplo, pegar base1 nuevamente en la columna 8 y fila 20. 
+writeData(wb = wb2,       
+      sheet = "pestaña1",
+      startCol = 8, 
+      startRow = 20,
+      x = base1)    
+
+## Para ver archivo revisar output de repositorio: "nombre_archivo12.xlsx"
+```
+
+
+
+---
+
+# El paquete `openxlsx`
+
+--
+
+A continuación se revisan algunos comandos que se pueden agregar entre la creación del objeto wb (Work Book) y su exportación. Específicamente, después de crear pestañas en el libro de trabajo y cargarle los objetos.
+
+Estas modificaciones al libro de trabajo se van agregando progresivamente. 
+
+--
+
+.medium-par[Configurar la anchura de las columnas]
+
+
+```r
+## Se repite el proceso de crear WB, dar pestaña y cargar objeto:
+wb &lt;- createWorkbook()  
+
+addWorksheet(wb,        
+      sheetName = "pestaña1", 
+      gridLines = TRUE)
+
+writeData(wb = wb,        
+      sheet = "pestaña1", 
+      x = base1)        
+
+## Nuevo comando:
+setColWidths(wb, 
+            sheet = 1, 
+          cols = c(1,2,3), ## Columnas a ensanchar 
+          widths = 10)      ## Anchura 
+```
+
+
+
+---
+
+# El paquete `openxlsx`
+
+--
+
+Queda así:
+
+![](imagenes/anchura.PNG)
+
+
+---
+
+# El paquete `openxlsx`
+
+--
+
+.medium-par[Inmovilizar paneles]
+
+
+```r
+freezePane(wb,                  ## Libro de trabajo
+           sheet= "pestaña1",   ## Pestaña en la que se aplica
+           firstRow = TRUE,     ## Inmobilizar fila superior
+           firstCol = TRUE)     ## Inmobilizar primera columna
+```
+
+
+
+
+--
+
+Queda así:
+
+![](imagenes/inm.PNG)
+
+
+---
+
+# El paquete `openxlsx`
+
+--
+
+.medium-par[Aplicar colores y estilos]
+
+Se requieren dos pasos: crear el objeto "estilo" y aplicar el objeto "estilo" al libro de trabajo (wb)
+
+
+```r
+## Se crea estilo de celda azul, letra negras y ennegrecidas
+blue_bold &lt;- createStyle(fontColour = "black",     ## Color letra
+                        bgFill = "skyblue3",      ## Color celda
+                        textDecoration = "bold")  ## Estilo de la letra
+```
+
+
+```r
+# Aplicar colores a nombres de columnas
+conditionalFormatting(wb, sheet = "pestaña1",   ## libro y pestaña
+                      cols = 1:2, ## columna
+                      rows = 1,   ## fila
+                      rule = "!=0", ## Condición
+                      style = blue_bold) ## Aplicar el estilo
+```
+
+--
+
+
+
+--
+
+![](imagenes/color_col.PNG)
+
+
+---
+
+# El paquete `openxlsx`
+
+--
+
+.medium-par[Aplicar colores y estilos]
+
+También se pueden pintar las celdas si cumplen condición
+
+
+```r
+## Se crea estilo de celda azul, letra negras y ennegrecidas
+red &lt;- createStyle(fontColour = "black",     ## Color letra
+                         bgFill = "red")           ## Color celda
+```
+
+--
+
+
+```r
+# Aplicar colores a nombres de columnas
+conditionalFormatting(wb, sheet = "pestaña1",   ## libro y pestaña
+                      cols = 1, ## solo columna 1
+                      rows = 2:11,   ## todas las filas, menos la primera
+                      rule = "&gt;3", ## Condición mayor a 3
+                      style = red) ## Aplicar el estilo
+```
+
+--
+
+
+
+--
+
+![](imagenes/color_col_cond.PNG)
+
+
+---
+
+
+# El paquete `openxlsx`
+
+--
+
+.medium-par[Aplicar porcentajes]
+
+Lógica similar a la de los colores. Primero crear un estilo "porcentaje" y luego se aplica. 
+
+
+```r
+## Se crea estilo porcentaje (con un decimal)
+pct = createStyle(numFmt="0.0%")
+
+## Se aplica estilo porcentaje a las celdas deseadas
+addStyle(wb, 
+         sheet = 1,  
+         style=pct, 
+         cols=2, 
+         rows=3:4, 
+         gridExpand=TRUE)
+```
+
+
+
+--
+
+![](imagenes/porcentaje.PNG)
+
+
+---
+
+# El paquete `openxlsx`
+
+--
+
+.medium-par[Hipervínculos]
+
+
+```r
+## Creamos nueva pestaña sin agregar objeto
+
+addWorksheet(wb,
+      sheetName = "pestaña2", 
+      gridLines = FALSE)
+
+## Creamos hipervinculo que nos lleve a la pestaña 2
+
+writeFormula(wb,        ## En libro WB
+             "pestaña1",  ## pestaña1 
+             startRow = 6, ## En la fila 6, aplica hipervínculo:
+             
+             x = makeHyperlinkString(sheet = "pestaña2", ## Lleva a pestaña2
+                                     row = 1,            ## Fila 1
+                                     col = 1,            ## Columna 1
+                                     text = "ACA LINK")) ## Texto del link
+```
+
+
+
+--
+
+![](imagenes/hiper1.PNG)
+
+
+
+
+---
+
+
+# Referencias y materiales de consulta
+
+--
+
+[Manual del paquete openxlsx](https://cran.r-project.org/web/packages/openxlsx/openxlsx.pdf).
+
+[Identificación de colores en una imagen](https://imagecolorpicker.com/).
+
+[Colores en R y códigos de colores](http://www.sthda.com/english/wiki/colors-in-r).
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

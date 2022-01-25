@@ -346,13 +346,142 @@ Condición false, no pasa nada...
 
 # if()
 
+Para tener respuesta con condición incorrecta, agregar `else`
+
+```{r}
+n <- 1
+if((n+2)==2){
+  "suma correcta"
+} else{
+  "suma incorrecta"
+}
+```
+--
+
+```{r}
+n <- 0
+if(n+n > 0){
+  "n es positivo"
+} else if(n+n < 0) {
+  "n es negativo"
+} else{
+  "n es cero"
+}
+```
+
+---
+
+# for()
+
+Para cada valor X en una secuencia que va de Y a Z, ejecuta una acción. 
+
+--
+
+```{r echo=FALSE, fig.align='center',out.width="70%"}
+knitr::include_graphics('https://media.geeksforgeeks.org/wp-content/uploads/20200327192448/for_flowdiagram.png')
+```
+
+--
+
+`while()` y `repeat()` pueden ser útiles. En los personal no he tenido que usarlos. 
+
+Entendiendo la lógica de `for()` e `if()` estas funciones no tienen mayor complejidad. 
+
+---
+
+# for()
+
+Ejemplo simple:
+
+```{r}
+for(i in 1:5){
+  print(i + 1)
+}
+```
+
+--
+
+Imaginen la potencia de esto para exportar o importar cientos de archivos...
+
+--
+
+Veamos un ejemplo con las bases de puestos de trabajo de la EMR
+
+---
+
+# for()
+
+Crear secuencia de fechas
+
+```{r message=FALSE, warning=FALSE}
+library(dplyr)
+library(lubridate)
+
+inicio <- "2016-01-01"
+fin <- "2017-02-01"   
+
+meses <- ((ymd(inicio) %--% ymd(fin)) / months(1) )
+
+ano_mes_dia <- ymd(inicio) %m+% months(0:meses) %>% as.character()
+ano_mes_dia
+
+meses <- length(ano_mes_dia)
+```
+
+---
+
+# for()
+
+Crear secuencia de meses en español
+
+```{r error=TRUE, message=FALSE, warning=FALSE}
+meses_esp <- rep(c("enero","febrero","marzo","abril","mayo","junio",
+      "julio","agosto","septiembre","octubre","noviembre","diciembre"),
+      trunc(meses/12))
+
+meses_esp <- c(meses_esp,meses_esp[0:(meses%%12)])
+
+meses_esp
+
+
+length(meses_esp)==length(ano_mes_dia)
+
+```
+
+---
+
+# for()
+
+Descargar bases
+
+```{r eval=FALSE}
+
+for(i in 1:meses){
+  
+download.file(paste0("https://www.ine.cl/docs/default-source/sueldos-y-salarios/bbdd/base-anual-2016/base-de-puestos-de-trabajo/bases-rectificadas/",
+     year(ano_mes_dia[i]),"/",
+     meses_esp[i],"-",
+     year(ano_mes_dia[i]),".csv?sfvrsn=54c360d8_6&download=true"),
+     destfile = paste0("datos_pt/",
+                       year(ano_mes_dia[i]),"_",
+                       sprintf("%02d", month(ano_mes_dia[i])),".csv"),
+     method = "libcurl")
+}
+
+```
+
+--
+
+```{r}
+list.files("datos_pt/")
+```
 
 
 ---
 
 # for()
 
-
+Ahora cargar bases en R
 
 
 ---
@@ -363,15 +492,9 @@ class: inverse, center, middle
 
 `function()`
 
-
 ---
 
-class: inverse, center, middle
-
-# Entender los paquetes
-
-`devtools`
-
+# Funciones
 
 
 ---
@@ -382,4 +505,5 @@ class: inverse, center, middle
 
 [Ilustraciones de Allison Horst](https://github.com/allisonhorst/stats-illustrations)
 
+[Loops in R](https://www.geeksforgeeks.org/loops-in-r-for-while-repeat/)
 
