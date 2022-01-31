@@ -28,7 +28,7 @@ class: inverse, center, title-slide, middle
 
 # Taller R - Rifa Valentina
 
-## Funciones y procesos iterativos
+## Elecciones, loops y funciones
 
 ### [Nicolás Ratto](https://github.com/nicolasrattor/)
 
@@ -128,9 +128,10 @@ list.files()
 ## [10] "4.-survey.html"      "4. survey.Rmd"       "5.-iteraciones.html"
 ## [13] "5.-iteraciones.Rmd"  "5. iteraciones.Rmd"  "6.-openxlsx.html"   
 ## [16] "6. openxlsx.Rmd"     "data"                "datos-encuesta"     
-## [19] "datos_ene"           "datos_pt"            "imagenes"           
-## [22] "libs"                "output"              "pdf"                
-## [25] "README.md"           "tallerR_rifa.Rproj"  "xaringan-themer.css"
+## [19] "datos.xlsx"          "datos_ene"           "datos_pt"           
+## [22] "imagenes"            "libs"                "output"             
+## [25] "pdf"                 "README.md"           "tallerR_rifa.Rproj" 
+## [28] "xaringan-themer.css"
 ```
 --
 
@@ -361,9 +362,9 @@ download.file(url, destfile, mode = "wb")
 
 class: inverse, center, middle
 
-# Proceso iterativo y condiciones
+# Elecciones o condiciones
 
-`for() e if()`
+`if() e ifelse()`
 
 ---
 
@@ -373,9 +374,8 @@ Ya lo vimos un poco, la lógica es:
 
 
 ```r
-if(condicion){
-  acción a implementar si la condicion es verdadera
-}
+if (condition) true_action
+if (condition) true_action else false_action
 ```
 
 --
@@ -441,19 +441,134 @@ if(n+n &gt; 0){
 
 ---
 
+# if()
+
+
+```r
+x &lt;- 70
+```
+
+--
+
+
+```r
+if (x &gt; 90) {
+"A"
+} else if (x &gt; 80) {
+"B"
+} else if (x &gt; 50) {
+"C"
+} else {
+"F"
+}
+```
+
+```
+## [1] "C"
+```
+
+---
+
+# ifelse()
+
+Es un if vectorizado
+
+--
+
+En if x solo puede tener una longitud de 1
+
+
+```r
+x &lt;- 70:90
+
+if (x &gt; 90) {
+"A"
+} else {
+"F"
+}
+```
+
+```
+## Warning in if (x &gt; 90) {: la condición tiene longitud &gt; 1 y sólo el primer
+## elemento será usado
+```
+
+```
+## [1] "F"
+```
+
+---
+
+# ifelse()
+
+
+```r
+x &lt;- 1:10
+ifelse(x %% 5 == 0, 
+       "XXX", 
+       as.character(x))
+```
+
+```
+##  [1] "1"   "2"   "3"   "4"   "XXX" "6"   "7"   "8"   "9"   "XXX"
+```
+
+--
+
+Otro if vectorizado y más general es `dplyr::case_when()`
+
+--
+
+
+```r
+dplyr::case_when(
+x %% 5 == 0 ~ "fizz",
+x %% 2 == 0 ~ "buzz",
+is.na(x) ~ "???",
+TRUE ~ as.character(x)
+)
+```
+
+```
+##  [1] "1"    "buzz" "3"    "buzz" "fizz" "buzz" "7"    "buzz" "9"    "fizz"
+```
+
+
+
+---
+
+class: inverse, center, middle
+
+# Procesos iterativos o loops
+
+`for()`
+
+---
+
 # for()
 
 Para cada valor X en una secuencia que va de Y a Z, ejecuta una acción. 
 
 --
 
-&lt;img src="https://media.geeksforgeeks.org/wp-content/uploads/20200327192448/for_flowdiagram.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+```r
+for (item in vector) perform_action
+```
+
 
 --
 
-`while()` y `repeat()` pueden ser útiles. En los personal no he tenido que usarlos. 
+&lt;img src="https://media.geeksforgeeks.org/wp-content/uploads/20200327192448/for_flowdiagram.png" width="60%" style="display: block; margin: auto;" /&gt;
 
-Entendiendo la lógica de `for()` e `if()` estas funciones no tienen mayor complejidad. 
+--
+
+`while()` y `repeat()` pueden ser útiles. En los personal no he tenido que usarlos.
+
++ `while` hace una acción mientras la condición es TRUE
+
++ `repeat` repite una acción por siempre (hasta que encuentre un quiebre)
+
 
 ---
 
@@ -586,18 +701,244 @@ list.files("datos_pt/")
 
 Ahora cargar bases en R
 
+--
+
+
+```r
+archivos &lt;- list.files("datos_pt/",full.names = TRUE)
+nombres &lt;- paste0(
+  "pt_",
+  stringr::str_remove_all(list.files("datos_pt/"),
+                                   ".csv")
+)
+```
+
+--
+
+
+```r
+for(i in 1:length(archivos)){
+  assign(nombres[i],
+read.csv2(archivos[i])
+)
+}
+```
+
+
+---
+
+# for()
+
+&lt;img src="imagenes/bases_cargadas.PNG" width="60%" style="display: block; margin: auto;" /&gt;
+
+--
+
+Las bases se pueden tomar desde el *environment* para nuevos procesos o nunca guardarlas en el ambiente, para no gastar memoria.
+
+---
+
+# for()
+
+Por ejemplo, saber el número de observaciones que tiene cada base
+
+--
+
+
+```r
+base_vacia &lt;- data.frame(periodo=ano_mes_dia,
+                         nfilas =NA)
+```
+
+--
+
+
+```r
+head(base_vacia,1)
+```
+
+```
+##      periodo nfilas
+## 1 2016-01-01     NA
+```
+
+--
+
+
+```r
+for(i in 1:length(archivos)){
+  base_vacia[i,2] &lt;- nrow(read.csv2(archivos[i]))
+}
+```
+
+--
+
+
+```r
+head(base_vacia,3)
+```
+
+```
+##      periodo nfilas
+## 1 2016-01-01  31698
+## 2 2016-02-01  31698
+## 3 2016-03-01  31698
+```
+
+
+
+
 
 ---
 
 class: inverse, center, middle
 
-# Funciones
+# Crear funciones
 
 `function()`
 
 ---
 
 # Funciones
+
+Las funciones que regularmente creamos son para evitar duplicaciones de códigos. 
+
+--
+
+Si estas funciones resuelven problemas para otros y/o tenemos interesantes datos para compartir con otros, podría ser pertinente crear una `paquete`. 
+
+--
+
+Las funciones son objetos, tal como los vectores. 
+
+--
+
+Los tres componentes de una función: argumentos, cuerpo y ambiente
+
+--
+
+El ambiente es la estructura de datos que determina como la función encuentra los valores asociados a los nombres
+
+--
+
+
+
+```r
+f02 &lt;- function(x, y) {
+# Comentario
+x + y
+}
+```
+--
+
+
+```r
+f02(3,5)
+```
+
+```
+## [1] 8
+```
+
+---
+
+# funciones de utilidad
+
+(no empaquetadas)
+
+--
+
+.inverse[Primera letra en mayúscula]
+
+
+```r
+firstup &lt;- function(x) {
+  substr(x, 1, 1) &lt;- toupper(substr(x, 1, 1))
+  x
+}
+```
+
+--
+
+
+```r
+texto &lt;- c("manufactura","comercio")
+firstup(texto)
+```
+
+```
+## [1] "Manufactura" "Comercio"
+```
+
+---
+
+# funciones de utilidad
+
+--
+
+.inverse[Visualizar como excel]
+
+
+```r
+tabladeprueba &lt;- data.frame(a=1:10,b=21:30)
+
+aexcel &lt;- function (datos)
+{
+  writexl::write_xlsx(datos, paste0("datos.xlsx"))
+  writeLines(paste0("El documento fue guardado en tu actual working directory: \n",
+                    getwd()))
+  shell("datos.xlsx")
+}
+```
+
+--
+
+
+```r
+aexcel(tabladeprueba)
+```
+
+
+--
+
+Código escrito por David Jorquera, compañero de INE.
+
+---
+
+# funciones de utilidad
+
+
+```r
+n_meses &lt;- function(x){
+  x &lt;- tolower(x)
+  x &lt;- dplyr::case_when(
+             x %in% c("ene","enero") ~ 1,
+             x %in% c("feb","febrero") ~ 2,
+             x %in% c("mar","marzo") ~ 3,
+             x %in% c("abr","abril") ~ 4,
+             x %in% c("may","mayo") ~ 5,
+             x %in% c("jun","junio") ~ 6,
+             x %in% c("jul","julio") ~ 7,
+             x %in% c("ago","agosto") ~ 8,
+             x %in% c("sep","sept","septiembre") ~ 9,
+             x %in% c("oct","octubre") ~ 10,
+             x %in% c("nov","noviembre") ~ 11,
+             x %in% c("dic","diciembre") ~ 12)
+  x
+}
+```
+--
+
+
+```r
+meses_significativos &lt;- c("May","sePt","febrero")
+n_meses(meses_significativos)
+```
+
+```
+## [1] 5 9 2
+```
+
+
 
 
 ---
@@ -607,6 +948,8 @@ class: inverse, center, middle
 [Xaringan: Presentation Ninja, de Yihui Xie](https://github.com/yihui/xaringan). Para generar esta presentación.
 
 [Ilustraciones de Allison Horst](https://github.com/allisonhorst/stats-illustrations)
+
+[Advanced R, by Hadley Wickham](https://www.amazon.com/-/es/Hadley-Wickham/dp/0815384572)
 
 [Loops in R](https://www.geeksforgeeks.org/loops-in-r-for-while-repeat/)
 
