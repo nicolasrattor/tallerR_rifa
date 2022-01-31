@@ -1,7 +1,5 @@
 ---
 title: "Taller R - Rifa Valentina"
-subtitle: "Exportar a excel controlando formatos"
-date: "`23/02/2022`"
 author: "Nicolás Ratto"
 output:
   xaringan::moon_reader:
@@ -11,6 +9,7 @@ output:
       highlightStyle: github
       highlightLines: true
       countIncrementalSlides: false
+    seal: false
 ---
 
 
@@ -50,33 +49,48 @@ style_duo(
 #pagedown::chrome_print(input="6.-openxlsx.html",output="pdf/6. openxlsx.pdf")
 ```
 
+class: inverse, center, title-slide, middle
+
+<style>
+.title-slide .remark-slide-number {
+  display: none;
+}
+</style>
+
+# Taller R - Rifa Valentina
+
+## Exportar a excel controlando formatos
+
+### [Nicolás Ratto](https://github.com/nicolasrattor/)
+
+### `2022/02/02`
+
+<a href="https://github.com/nicolasrattor/" class="github-corner" aria-label="View source on Github"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#fff; color:#151513; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+
+---
 
 # Exportar archivos a excel
 
 --
-<br/>
 
-.medium-par[Hay muchas formas de exportar tablas y bases de datos desde R a Excel.]
-<br/>
-<br/>
+Hay muchas formas de exportar tablas y bases de datos desde R a Excel.
 
 --
 
-.medium-par[El proceso resulta fundamental cuando trabajamos en equipos y no todos manejan el lenguaje de R.]
-<br/>
-<br/>
+El proceso resulta fundamental cuando trabajamos en equipos y no todos manejan el lenguaje de R.
 
 --
 
-.medium-par[El universo `tidyverse` no cuenta con paquetes para exportar datos a excel en formato `.xlsx`.]
-<br/>
-<br/>
+El universo `tidyverse` no cuenta con paquetes para exportar datos a excel en formato `.xlsx`.
 
 --
 
-.medium-par[La forma quizás más sencilla y difundida de hacerlo es con el paquete `writexl` (sintaxis sencilla y corta, pero limitada).]
-<br/>
-<br/>
+La forma quizás más sencilla y difundida de hacerlo es con el paquete [`writexl`](https://docs.ropensci.org/writexl/) del universo de R Open Science: <https://ropensci.org/>
+
+--
+
+La sintaxis es sencilla y corta, pero limitada.
 
 
 
@@ -86,9 +100,14 @@ style_duo(
 
 --
 
-.medium-par[En primer lugar creemos una base de datos ficticia:]
+En primer lugar creemos una base de datos ficticia:
 
 --
+
+```{r echo=FALSE}
+library(writexl)          
+```
+
 
 ```{r}
 base1<-as.data.frame(cbind(
@@ -96,19 +115,18 @@ base1<-as.data.frame(cbind(
   b=c(1:10)
 ))
 
-head(base1,4)
+head(base1,2)
 ```
 
 --
 
-.medium-par[Para exportar la base de datos solamente hay que cargar el paquete `writexl` y especificar dos argumentos en la función `write_xlsx`:]
+Para exportar la base de datos solamente hay que cargar el paquete `writexl` y especificar dos argumentos en la función `write_xlsx`
 
 --
 
 ```{r warning=FALSE}
-library(writexl)          
-write_xlsx(base1,          # objeto a exportar (data frame)
-  "output/nombre_archivo.xlsx")   # nombre de archivo a crear
+writexl::write_xlsx(base1,      # objeto a exportar (data frame)
+  "output/nombre_archivo.xlsx") # nombre de archivo a crear
 
 ```
 
@@ -118,11 +136,7 @@ write_xlsx(base1,          # objeto a exportar (data frame)
 
 # Exportación con `writexl`
 
---
-<br/>
-
-.medium-par[Por defecto, `write_xlsx` considerará en la exportación el nombre de las columnas y las pondrá centradas y en **negrito**.]
-
+Por defecto, `write_xlsx` considerará en la exportación el nombre de las columnas y las pondrá centradas y en **negrito**.
 
 --
 
@@ -132,21 +146,18 @@ write_xlsx(base1,          # objeto a exportar (data frame)
 
 # Exportación con `writexl`
 
---
-
-.medium-par[¿Como evitarlo?]
+¿Como evitarlo?
 
 --
 
-Existen dos argumentos extra con los que se puede "jugar" en la función `write_xlsx`: col_names y format_headers.
+Existen dos argumentos extra con los que se puede "jugar" en la función `write_xlsx`: `col_names` y `format_headers`.
 
 --
 
 Quitar nombres de columnas:
 
 ```{r warning=FALSE}
-library(writexl)          
-write_xlsx(base1,              # objeto a exportar (data frame)
+write_xlsx(base1,               # objeto a exportar (data frame)
   "output/nombre_archivo2.xlsx",  # nombre de archivo a crear
   col_names = FALSE,            # Base sin nombres de columnas
   ) 
@@ -158,7 +169,6 @@ write_xlsx(base1,              # objeto a exportar (data frame)
 Dejar nombre de columnas pero quitarles el formato
 
 ```{r warning=FALSE}
-library(writexl)          
 write_xlsx(base1,              # objeto a exportar (data frame)
   "output/nombre_archivo3.xlsx",  # nombre de archivo a crear
   col_names = TRUE,            # Base con nombres de columnas
@@ -185,13 +195,11 @@ Para esto, las distintas bases de datos a exportar deben agruparse en una lista 
 ## Se crean dos nuevas bases de datos
 base2<-as.data.frame(cbind(c=c(1:10),d=c(1:10)))
 base3<-as.data.frame(cbind(e=c(1:10),f=c(1:10)))
-
 ```
 
 --
 
 ```{r warning=FALSE}
-library(writexl)          
 write_xlsx(list(base1,base2,base3), # Bases en una lista.
   "output/nombre_archivo4.xlsx",  # nombre de archivo a crear
   ) 
@@ -203,22 +211,19 @@ write_xlsx(list(base1,base2,base3), # Bases en una lista.
 
 --
 
-En base a los cuatro argumentos de `write_xlsx`, ¿cómo podemos crear un archivo excel como el siguiente?
+En base a los cuatro argumentos de `write_xlsx`, ¿cómo podemos crear un archivo *excel* como el siguiente?
 
 --
 
-**Extracto base auditoría IR-ICMO**
 ![Extracto base auditoría IR-ICMO](imagenes/auditoriaIRICMO.PNG)
 
 --
 
-No se puede. Hay que recurrir a funciones de otros paquetes, como `openxlsx`, que pemitirán:
+No se puede. Hay que recurrir a otros paquetes, como `openxlsx`, para
 
 + Definir formato de celdas (color, color condicional, %, carácter, etc.)
 + Pegar más de una base de datos por pestañas
-+ Inmovilizar paneles
-+ Muchas cosas más. 
-
++ Inmovilizar paneles y otras muchas cosas...
 
 ---
 
@@ -253,7 +258,7 @@ Más complejo, pero vale la pena para tener más control sobre los libros excel 
 
 --
 
-Lo más simple es copiar y pegar este código cuando quieran exportar, limitándose a cambiar los argumentos según sus objetos y direcciones de trabajo. 
+Lo más simple es copiar y pegar este código cuando quieran exportar.
 
 
 ---
@@ -268,7 +273,11 @@ Una gran ventaja de `openxlsx` es que en una misma pestaña de excel pueden agre
 
 --
 
-Esto se logra señalando la posición exacta de cada una:
+Esto se logra señalando la posición exacta de cada una.
+
+--
+
+La primera:
 
 ```{r}
 
@@ -286,11 +295,15 @@ writeData(wb = wb2,        ## En el libro wb2
 
 ```
 
+---
+
+# El paquete `openxlsx`
+
+Y para la segunda...
+
 --
 
-Pero la posición de los objetos se puede determinar manualmente:
-
---
+Se puede determinar manualmente su posición:
 
 ```{r}
 
@@ -301,6 +314,7 @@ writeData(wb = wb2,
 
 ```
 
+--
 
 ```{r echo=FALSE}
 saveWorkbook(wb = wb2,     ## Exportamos el libro
@@ -319,11 +333,12 @@ saveWorkbook(wb = wb2,     ## Exportamos el libro
 
 ![](imagenes/base1x2.PNG)
 
---
 
-Evidentemente, señalándolo correctamente se puede volver agregar la base1 (u otra data frame) en cualquier otra posición de la pestaña1. 
+---
 
---
+# El paquete `openxlsx`
+
+Se puede volver agregar la base1 (u otra data frame) en cualquier otra posición de la pestaña1. 
 
 ```{r}
 ## Por ejemplo, pegar base1 nuevamente en la columna 8 y fila 20. 
@@ -333,11 +348,11 @@ writeData(wb = wb2,
       startRow = 20,
       x = base1)    
 
-## Para ver archivo revisar output de repositorio: "nombre_archivo12.xlsx"
-
 ```
 
-```{r echo=FALSE}
+--
+
+```{r}
 saveWorkbook(wb = wb2,     ## Exportamos el libro
           file = "output/nombre_archivo12.xlsx", 
           overwrite = TRUE)
@@ -347,15 +362,17 @@ saveWorkbook(wb = wb2,     ## Exportamos el libro
 
 # El paquete `openxlsx`
 
---
-
-A continuación se revisan algunos comandos que se pueden agregar entre la creación del objeto wb (Work Book) y su exportación. Específicamente, después de crear pestañas en el libro de trabajo y cargarle los objetos.
+A continuación se revisan algunos comandos que se pueden agregar entre la creación del objeto wb (Work Book) y su exportación.
 
 Estas modificaciones al libro de trabajo se van agregando progresivamente. 
 
 --
 
-.medium-par[Configurar la anchura de las columnas]
+.inverse[Configurar la anchura de las columnas]
+
+--
+
+Crear libro, pestaña y agregar data a pestaña:
 
 ```{r}
 ## Se repite el proceso de crear WB, dar pestaña y cargar objeto:
@@ -369,13 +386,24 @@ writeData(wb = wb,
       sheet = "pestaña1", 
       x = base1)        
 
-## Nuevo comando:
+```
+
+---
+
+# El paquete `openxlsx`
+
+Definir la anchura de tres columnas
+
+```{r}
 setColWidths(wb, 
             sheet = 1, 
           cols = c(1,2,3), ## Columnas a ensanchar 
           widths = 10)      ## Anchura 
-
 ```
+
+--
+
+Exportar el libro
 
 ```{r echo=FALSE, results=FALSE}
 saveWorkbook(wb = wb,     ## Exportamos el libro
@@ -400,7 +428,7 @@ Queda así:
 
 --
 
-.medium-par[Inmovilizar paneles]
+.inverse[Inmovilizar paneles]
 
 ```{r}
 freezePane(wb,                  ## Libro de trabajo
@@ -410,6 +438,7 @@ freezePane(wb,                  ## Libro de trabajo
 
 ```
 
+--
 
 ```{r echo=FALSE, results=FALSE}
 saveWorkbook(wb = wb,     ## Exportamos el libro
@@ -428,9 +457,9 @@ Queda así:
 
 # El paquete `openxlsx`
 
---
+.inverse[Aplicar colores y estilos]
 
-.medium-par[Aplicar colores y estilos]
+--
 
 Se requieren dos pasos: crear el objeto "estilo" y aplicar el objeto "estilo" al libro de trabajo (wb)
 
@@ -459,10 +488,10 @@ saveWorkbook(wb = wb,     ## Exportamos el libro
           overwrite = TRUE)
 ```
 
---
 
-![](imagenes/color_col.PNG)
-
+```{r out.width = "30%", fig.pos="h", fig.align="center", echo=FALSE}
+knitr::include_graphics("imagenes/color_col.PNG")
+```
 
 ---
 
@@ -470,7 +499,9 @@ saveWorkbook(wb = wb,     ## Exportamos el libro
 
 --
 
-.medium-par[Aplicar colores y estilos]
+.inverse[Aplicar colores y estilos]
+
+--
 
 También se pueden pintar las celdas si cumplen condición
 
@@ -500,21 +531,22 @@ saveWorkbook(wb = wb,     ## Exportamos el libro
           overwrite = TRUE)
 ```
 
---
-
-![](imagenes/color_col_cond.PNG)
-
+```{r out.width = "40%", fig.pos="h", fig.align="center", echo=FALSE}
+knitr::include_graphics("imagenes/color_col_cond.PNG")
+```
 
 ---
 
 
 # El paquete `openxlsx`
 
+.inverse[Aplicar porcentajes]
+
 --
 
-.medium-par[Aplicar porcentajes]
-
 Lógica similar a la de los colores. Primero crear un estilo "porcentaje" y luego se aplica. 
+
+--
 
 ```{r}
 ## Se crea estilo porcentaje (con un decimal)
@@ -530,15 +562,18 @@ addStyle(wb,
 
 ```
 
+--
+
 ```{r echo=FALSE, results=FALSE}
 saveWorkbook(wb = wb,     ## Exportamos el libro
           file = "output/nombre_archivo10.xlsx", 
           overwrite = TRUE)
 ```
 
---
+```{r out.width = "60%", fig.pos="h", fig.align="center", echo=FALSE}
+knitr::include_graphics("imagenes/porcentaje.PNG")
+```
 
-![](imagenes/porcentaje.PNG)
 
 
 ---
@@ -547,27 +582,30 @@ saveWorkbook(wb = wb,     ## Exportamos el libro
 
 --
 
-.medium-par[Hipervínculos]
+.inverse[Hipervínculos]
 
 ```{r}
 ## Creamos nueva pestaña sin agregar objeto
-
 addWorksheet(wb,
       sheetName = "pestaña2", 
       gridLines = FALSE)
 
-## Creamos hipervinculo que nos lleve a la pestaña 2
+```
 
+--
+
+```{r}
+## Creamos hipervinculo que nos lleve a la pestaña 2
 writeFormula(wb,        ## En libro WB
              "pestaña1",  ## pestaña1 
              startRow = 6, ## En la fila 6, aplica hipervínculo:
-             
-             x = makeHyperlinkString(sheet = "pestaña2", ## Lleva a pestaña2
-                                     row = 1,            ## Fila 1
-                                     col = 1,            ## Columna 1
-                                     text = "ACA LINK")) ## Texto del link
-
+            
+    x = makeHyperlinkString(sheet = "pestaña2", ## Lleva a pestaña2
+                            row = 1,            ## Fila 1
+                            col = 1,            ## Columna 1
+                            text = "ACA LINK")) ## Texto del link
 ```
+
 
 ```{r echo=FALSE, results=FALSE}
 saveWorkbook(wb = wb,     ## Exportamos el libro
@@ -577,9 +615,9 @@ saveWorkbook(wb = wb,     ## Exportamos el libro
 
 --
 
-![](imagenes/hiper1.PNG)
-
-
+```{r out.width = "50%", fig.pos="h", fig.align="center", echo=FALSE}
+knitr::include_graphics("imagenes/hiper1.PNG")
+```
 
 
 ---
@@ -587,7 +625,7 @@ saveWorkbook(wb = wb,     ## Exportamos el libro
 
 # Referencias y materiales de consulta
 
---
+[Formating with xlsx](https://ycphs.github.io/openxlsx/articles/Formatting.html)
 
 [Manual del paquete openxlsx](https://cran.r-project.org/web/packages/openxlsx/openxlsx.pdf).
 
