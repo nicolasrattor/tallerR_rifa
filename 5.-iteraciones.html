@@ -843,8 +843,6 @@ f02(3,5)
 
 # funciones de utilidad
 
-(no empaquetadas)
-
 --
 
 .inverse[Primera letra en mayúscula]
@@ -868,6 +866,21 @@ firstup(texto)
 ```
 ## [1] "Manufactura" "Comercio"
 ```
+
+--
+
+.inverse["Sumar" carácteres]
+
+
+```r
+`%+%` &lt;- function(a, b) paste0(a, b)
+"new " %+% "string"
+```
+
+```
+## [1] "new string"
+```
+
 
 ---
 
@@ -904,7 +917,7 @@ Código escrito por David Jorquera, compañero de INE.
 
 ---
 
-# funciones de utilidad
+.inverse[De mes character a numeric]
 
 
 ```r

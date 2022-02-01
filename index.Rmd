@@ -1,0 +1,26 @@
+---
+title: "Talleres R"
+description: |
+ Talleres R personalizados (nivel intermedio) para rifa Valentina Andrade 
+output: distill::distill_article
+---
+
+```{r setup, include=FALSE}
+#options(kableExtra.auto_format = FALSE)   
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Sesiones
+
+[1. Manipulación avanzada de data frames (funciones `pivot` y combinación de data frames)](1.-trasponer.html)
+
+[2. Manipulación de fechas: paquete `lubridate`](2.-tiempo.html)
+
+[3. Visualización de datos con `ggplot2`](3.-ggplot2.html)
+
+[4. Estimar desde diseños muestrales complejos (paquete `survey` y `srvyr`)](4.-survey.html)
+
+[5. Hacer funciones y procesos iterativos en `R`](5.-iteraciones.html)
+
+[6. Exportar a Excel controlando formatos (`openxlsx`)](6.-openxlsx.html)
