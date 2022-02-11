@@ -1,0 +1,77 @@
+---
+title: "Ejemplo automatización producción de gráficos"
+author: "Nicolás Ratto"
+date: "11-02-2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Cargar paquetes y crear data ficticia
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+data <- data.frame(x=dnorm(runif(99)),
+           y=dnorm(runif(99)),
+           a=runif(99),
+           b=runif(99),
+           z=rep(c("grupo1","grupo2","grupo3"),33))
+
+head(data)
+```
+
+# Primer tipo de gráficos: nube de puntos
+
+## Manualmente
+
+```{r}
+
+## solo seleccionar variables cuantitativas
+cuantis <- data %>% select(x,y,a,b)
+
+## ejemplo de gráfico
+cuantis %>% 
+  ggplot(aes(x= a, y= b)) +
+  geom_point()
+
+cuantis %>% 
+  ggplot(aes(x= get(names(cuantis)[1]), 
+             y= get(names(cuantis)[2]))) +
+  geom_point() +
+  labs(x=names(cuantis)[1], 
+       y=names(cuantis)[2])
+
+```
+
+## Automático
+
+```{r}
+
+# Crear tabla con posibles combinatorias
+combinaciones <- table(names(cuantis),names(cuantis)) %>% 
+  as.data.frame() %>% 
+  filter(Freq==0)
+
+combinaciones
+
+# Proceso automático
+for(i in 1:nrow(combinaciones)){
+  
+  print(
+  cuantis %>% 
+    ggplot(aes(x= get(as.character(combinaciones[i,1])), 
+               y= get(as.character(combinaciones[i,2])))) +
+    geom_point() +
+    labs(x=as.character(combinaciones[i,1]), 
+         y=as.character(combinaciones[i,2]))
+  )
+  
+}
+
+
+```
+
