@@ -188,7 +188,7 @@ knitr::include_graphics('imagenes/essential_democracy.PNG')
 --
 
 ```{r echo=FALSE, fig.align='center',out.width="40%"}
-knitr::include_graphics('imagenes/mega_cadem.PNG')
+knitr::include_graphics('imagenes/mega_cadem.png')
 ```
 
 
@@ -225,7 +225,7 @@ knitr::include_graphics('imagenes/be_aware_dual_axis.PNG')
 --
 
 ```{r echo=FALSE, fig.align='center',out.width="50%"}
-knitr::include_graphics('imagenes/evsemanal.png')
+knitr::include_graphics('imagenes/evsemanal.PNG')
 ```
 
 
@@ -260,13 +260,13 @@ Ignorar el gráfico
 --
 
 ```{r echo=FALSE, fig.align='center',out.width="50%"}
-knitr::include_graphics('imagenes/kast2.png')
+knitr::include_graphics('imagenes/kast2.PNG')
 ```
 
 --
 
 ```{r echo=FALSE, fig.align='center',out.width="50%"}
-knitr::include_graphics('imagenes/kast1.png')
+knitr::include_graphics('imagenes/kast1.PNG')
 ```
 
 ---
@@ -358,7 +358,7 @@ Las capas dentro de la función ggplot se concatenan con signos `+`
 
 .center[
 
-<img src="imagenes/heiss_capas_ggplot.png" width="600">
+<img src="imagenes/heiss_capas_ggplot.PNG" width="600">
 
 ]
 
@@ -1145,7 +1145,7 @@ install.packages("ggThemeAssist")
 --
 
 ```{r echo=FALSE, fig.align='center',out.width="80%"}
-knitr::include_graphics('imagenes/ggtheme.png')
+knitr::include_graphics('imagenes/ggtheme.PNG')
 ```
 
 
